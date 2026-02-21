@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-Hant">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Game Collection</title>
+    <title>遊戲大廳 - 我的派對遊戲庫</title>
     <style>
         :root {
             --bg: #0f172a;
@@ -11,9 +11,8 @@
             --accent: #38bdf8;
             --text: #f8fafc;
         }
-
         body {
-            font-family: 'Inter', system-ui, sans-serif;
+            font-family: 'Microsoft JhengHei', sans-serif;
             background-color: var(--bg);
             color: var(--text);
             margin: 0;
@@ -22,18 +21,8 @@
             align-items: center;
             padding: 2rem;
         }
-
-        header {
-            text-align: center;
-            margin-bottom: 3rem;
-        }
-
-        h1 {
-            font-size: 2.5rem;
-            color: var(--accent);
-            margin-bottom: 0.5rem;
-        }
-
+        header { text-align: center; margin-bottom: 3rem; }
+        h1 { font-size: 2.5rem; color: var(--accent); margin-bottom: 0.5rem; }
         .game-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -41,7 +30,6 @@
             max-width: 1000px;
             width: 100%;
         }
-
         .game-card {
             background: var(--card-bg);
             border: 1px solid #334155;
@@ -54,24 +42,13 @@
             flex-direction: column;
             justify-content: space-between;
         }
-
         .game-card:hover {
             transform: translateY(-5px);
             border-color: var(--accent);
             background: #273549;
         }
-
-        .game-card h2 {
-            margin: 0 0 10px 0;
-            color: var(--accent);
-        }
-
-        .game-card p {
-            font-size: 0.9rem;
-            line-height: 1.5;
-            color: #94a3b8;
-        }
-
+        .game-card h2 { margin: 0 0 10px 0; color: var(--accent); }
+        .game-card p { font-size: 0.9rem; line-height: 1.5; color: #94a3b8; }
         .status-badge {
             display: inline-block;
             background: #0ea5e9;
@@ -84,28 +61,39 @@
             margin-top: 15px;
             align-self: flex-start;
         }
-
-        .coming-soon {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
-
-        .coming-soon:hover {
-            transform: none;
-            border-color: #334155;
-        }
+        .locked { opacity: 0.6; cursor: not-allowed; }
     </style>
 </head>
 <body>
-
     <header>
-        <h1>Game Hub</h1>
-        <p>Pick a game and start playing!</p>
+        <h1>遊戲大廳</h1>
+        <p>選擇一個遊戲，開始與朋友互動吧！</p>
     </header>
 
     <main class="game-grid">
-        
-        <a href="character-game.html" class="game-card">
+        <a href="game.html" class="game-card">
             <div>
-                <h2>Character Deep-Dive</h2>
-                <p>A high-stakes party game where you learn your friends' deepest character secrets. Don't skip too many!</p>
+                <h2>角色真心話</h2>
+                <p>這是一個深入了解彼此性格的派對遊戲。誠實分享，或者承擔跳過的後果！</p>
+            </div>
+            <span class="status-badge">立即開始</span>
+        </a>
+
+        <div class="game-card locked">
+            <div>
+                <h2>敬請期待...</h2>
+                <p>正在開發新的派對小遊戲，敬請期待下一個驚喜！</p>
+            </div>
+            <span class="status-badge" style="background: #475569;">尚未開啟</span>
+        </div>
+    </main>
+</body>
+</html>           
+
+     
+          
+            
+        
+
+    
+        
