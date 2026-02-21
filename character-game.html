@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>角色真心話 - 派對遊戲</title>
+    <title>每個人真心話 動作遊戲</title>
     <style>
         body {
             font-family: 'Microsoft JhengHei', sans-serif;
@@ -35,25 +35,41 @@
             font-size: 1.4rem;
             margin: 2rem 0;
             min-height: 120px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
             line-height: 1.6;
+        }
+        .dare-box {
+            background: #e94560;
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 10px;
+            font-size: 1.2rem;
+            border: 2px dashed white;
         }
         .btn-group {
             display: flex;
+            flex-direction: column;
             gap: 15px;
-            justify-content: center;
+            align-items: center;
         }
         button {
-            padding: 12px 24px;
+            width: 100%;
+            padding: 15px;
             border: none;
             border-radius: 8px;
             cursor: pointer;
             font-weight: bold;
-            font-size: 1rem;
+            font-size: 1.1rem;
             transition: all 0.2s;
         }
-        button:active { transform: scale(0.95); }
+        button:active { transform: scale(0.98); }
         .btn-share { background: #4ecca3; color: #1a1a2e; }
-        .btn-next { background: #e94560; color: white; }
+        .btn-skip { background: #e94560; color: white; }
+        .btn-done { background: #f9d371; color: #1a1a2e; }
         .btn-reset { background: #533483; color: white; margin-top: 20px; }
         .hidden { display: none; }
         .skip-warning { color: #e94560; font-weight: bold; }
@@ -64,22 +80,26 @@
 <div class="container">
     <div id="game-ui">
         <div class="stats">
-            <span>進度: <span id="q-count">0</span> / 30</span>
-            <span class="skip-warning">跳過次數: <span id="skip-count">0</span> / 8</span>
+            <span>題數: <span id="q-count">0</span> / 30</span>
+            <span class="skip-warning">略過次數: <span id="skip-count">0</span> / 8</span>
         </div>
         
-        <div id="question-display">點擊下方按鈕開始遊戲</div>
+        <div id="question-display">
+            <div id="text-content">準備好開始挑戰了嗎？</div>
+            <div id="dare-content" class="dare-box hidden"></div>
+        </div>
 
         <div class="btn-group">
-            <button id="share-btn" class="btn-share hidden">我已分享 ✅</button>
-            <button id="next-btn" class="btn-next">開始遊戲</button>
+            <button id="start-btn" class="btn-share">開始遊戲</button>
+            <button id="share-btn" class="btn-share hidden">我已分享 ✅ (下一題)</button>
+            <button id="skip-btn" class="btn-skip hidden">Dare to Skip (挑戰略過)</button>
+            <button id="done-btn" class="btn-done hidden">任務完成 (Done)</button>
         </div>
     </div>
 
     <div id="end-screen" class="hidden">
         <h2 id="end-message">遊戲結束</h2>
         <button class="btn-reset" onclick="location.reload()">重新開始</button>
-        <br>
         <button class="btn-reset" onclick="location.href='index.html'" style="background:#334155;">回首頁</button>
     </div>
 </div>
@@ -105,37 +125,59 @@
         "你曾夢想過自己未來的生活嗎？是什麼樣的？", "如果不當現在的職業/學生，你會做什麼？"
     ];
 
+    const dares = [
+        "做4個不同表情",
+        "用充滿感情的方式朗讀手機裡最後一條訊息",
+        "喝下一杯水",
+        "模仿在場的一個人，直到有人猜出來是誰",
+        "唱歌20秒",
+        "閉上眼睛30秒",
+        "展示手機相簿裡最後一張照片",
+        "單腳企30秒,
+        "表演一件拿手的事",
+        "跟右邊的人擊掌"
+    ];
+
     let qIndex = 0;
     let skipCount = 0;
-    let sharedThisTurn = false;
-    let gameStarted = false;
-    let currentQuestions = [...questions].sort(() => Math.random() - 0.5);
+    let shuffledQuestions = [...questions].sort(() => Math.random() - 0.5);
 
-    const qDisplay = document.getElementById('question-display');
+    const textContent = document.getElementById('text-content');
+    const dareContent = document.getElementById('dare-content');
     const qCountText = document.getElementById('q-count');
     const skipCountText = document.getElementById('skip-count');
-    const nextBtn = document.getElementById('next-btn');
+    
+    const startBtn = document.getElementById('start-btn');
     const shareBtn = document.getElementById('share-btn');
+    const skipBtn = document.getElementById('skip-btn');
+    const doneBtn = document.getElementById('done-btn');
+    
     const gameUI = document.getElementById('game-ui');
     const endScreen = document.getElementById('end-screen');
     const endMessage = document.getElementById('end-message');
 
-    function updateDisplay() {
-        if (qIndex >= 30) {
-            endGame("挑戰完成！你已經回答了 30 個問題。");
-            return;
-        }
-        if (skipCount >= 8) {
-            endGame("太可惜了！你略過了太多次，遊戲結束。");
-            return;
-        }
-
-        qDisplay.innerText = currentQuestions[qIndex];
+    function renderQuestion() {
+        textContent.innerText = shuffledQuestions[qIndex];
+        dareContent.classList.add('hidden');
+        
+        shareBtn.classList.remove('hidden');
+        skipBtn.classList.remove('hidden');
+        doneBtn.classList.add('hidden');
+        
         qCountText.innerText = qIndex + 1;
         skipCountText.innerText = skipCount;
-        sharedThisTurn = false;
-        shareBtn.innerText = "我已分享 ✅";
-        shareBtn.style.opacity = "1";
+    }
+
+    function checkEndConditions() {
+        if (skipCount >= 8) {
+            endGame("太狠了！挑戰次數用盡，遊戲結束。");
+            return true;
+        }
+        if (qIndex >= 30) {
+            endGame("太棒了！你們完成了 30 題的靈魂交流。");
+            return true;
+        }
+        return false;
     }
 
     function endGame(msg) {
@@ -144,30 +186,34 @@
         endMessage.innerText = msg;
     }
 
-    nextBtn.addEventListener('click', () => {
-        if (!gameStarted) {
-            gameStarted = true;
-            nextBtn.innerText = "下一題";
-            shareBtn.classList.remove('hidden');
-            updateDisplay();
-            return;
-        }
-
-        if (!sharedThisTurn) {
-            skipCount++;
-        }
-
-        qIndex++;
-        updateDisplay();
+    startBtn.addEventListener('click', () => {
+        startBtn.classList.add('hidden');
+        renderQuestion();
     });
 
     shareBtn.addEventListener('click', () => {
-        sharedThisTurn = true;
-        shareBtn.innerText = "記錄成功！";
-        shareBtn.style.opacity = "0.5";
+        qIndex++;
+        if (!checkEndConditions()) renderQuestion();
+    });
+
+    skipBtn.addEventListener('click', () => {
+        // 隨機選一個大冒險
+        const randomDare = dares[Math.floor(Math.random() * dares.length)];
+        dareContent.innerText = "🔥 挑戰任務：\n" + randomDare;
+        dareContent.classList.remove('hidden');
+        
+        // 切換按鈕狀態
+        shareBtn.classList.add('hidden');
+        skipBtn.classList.add('hidden');
+        doneBtn.classList.remove('hidden');
+    });
+
+    doneBtn.addEventListener('click', () => {
+        skipCount++;
+        qIndex++;
+        if (!checkEndConditions()) renderQuestion();
     });
 </script>
 
 </body>
 </html>
-
