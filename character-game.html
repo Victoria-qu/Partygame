@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>角色真心話 - 派對遊戲</title>
+    <title>每個人真心話 - 動作遊戲</title>
     <style>
         body {
             font-family: 'Microsoft JhengHei', sans-serif;
@@ -47,7 +47,7 @@
             padding: 15px;
             border-radius: 10px;
             margin-top: 15px;
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             border: 2px dashed white;
             width: 100%;
             box-sizing: border-box;
@@ -67,12 +67,16 @@
             font-weight: bold;
             font-size: 1.1rem;
             transition: all 0.2s;
+            display: block; /* 確保按鈕可見 */
         }
+        button:hover { opacity: 0.9; }
         button:active { transform: scale(0.98); }
         .btn-share { background: #4ecca3; color: #1a1a2e; }
         .btn-skip { background: #e94560; color: white; }
         .btn-done { background: #f9d371; color: #1a1a2e; }
-        .btn-reset { background: #533483; color: white; margin-top: 20px; }
+        .btn-reset { background: #533483; color: white; margin-top: 10px; }
+        
+        /* 隱藏邏輯 */
         .hidden { display: none !important; }
         .skip-warning { color: #e94560; font-weight: bold; }
     </style>
@@ -83,18 +87,18 @@
     <div id="game-ui">
         <div class="stats">
             <span>題數: <span id="q-count">0</span> / 30</span>
-            <span class="skip-warning">略過次數: <span id="skip-count">0</span> / 8</span>
+            <span class="skip-warning">略過: <span id="skip-count">0</span> / 8</span>
         </div>
         
         <div id="question-display">
-            <div id="text-content">準備好了解彼此了嗎？</div>
+            <div id="text-content">準備好開始挑戰了嗎？</div>
             <div id="dare-content" class="dare-box hidden"></div>
         </div>
 
         <div class="btn-group">
             <button id="start-btn" class="btn-share">開始遊戲</button>
             <button id="share-btn" class="btn-share hidden">我已分享 ✅ (下一題)</button>
-            <button id="skip-btn" class="btn-skip hidden">Dare to Skip (挑戰略過)</button>
+            <button id="skip-btn" class="btn-skip hidden">Dare to Skip (大冒險略過)</button>
             <button id="done-btn" class="btn-done hidden">任務完成 (Done)</button>
         </div>
     </div>
@@ -107,7 +111,12 @@
 </div>
 
 <script>
+document.addEventListener('DOMContentLoaded', () => {
     const questions = [
         "你最害怕失去什麼東西？", "如果你中了大獎，第一件事會買什麼？", "你最受不了別人什麼行為？",
         "你心目中完美的約會是什麼樣子的？", "你曾做過最令你感到自豪的事是什麼？", "壓力很大的時候，你會怎麼宣洩？",
-        "如果可以交換人生一天，你想跟誰交換？", "你最不擅長處理的人際關係是什麼？", "你對自己的外表最滿意的地方
+        "如果可以交換人生一天，你想跟誰交換？", "你最不擅長處理的人際關係是什麼？", "你對自己的外表最滿意的地方是哪裡？",
+        "你最想改掉的一個壞習慣是什麼？", "如果你能預知未來，你想看什麼？", "你最喜歡的童年回憶是什麼？",
+        "如果你可以擁有一種超能力，你會選什麼？", "你覺得自己是理智派還是感性派？", "最讓你感動的一部電影或一本書？",
+        "你人生中遇過最尷尬的事情是什麼？", "你最嚮往的生活地點在哪裡？", "你覺得什麼樣的人最吸引你？",
+        "如果你只剩最後一天，你會想做什麼？", "你有什麼不為人知的特殊才華嗎
