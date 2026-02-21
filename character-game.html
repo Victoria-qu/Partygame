@@ -2,123 +2,128 @@
 <html lang="zh-Hant">
 <head>
     <meta charset="UTF-8">
-    <title>每個人真心話</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>角色真心話</title>
     <style>
-        body { background: #1a1a2e; color: white; font-family: sans-serif; text-align: center; padding: 20px; }
-        .box { background: #16213e; padding: 20px; border-radius: 15px; max-width: 400px; margin: auto; }
-        button { width: 100%; padding: 15px; margin: 10px 0; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
-        .btn-start { background: #4ecca3; }
-        .btn-share { background: #4ecca3; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        
+        body { 
+            background: #1a1a2e; 
+            color: white; 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh; /* 填滿手機高度 */
+            width: 100vw;
+            overflow: hidden;
+        }
+
+        .container { 
+            background: #16213e; 
+            padding: 20px; 
+            border-radius: 20px; 
+            width: 90%; 
+            max-width: 400px; /* 電腦端不會過大 */
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 350px;
+        }
+
+        .stats { 
+            display: flex; 
+            justify-content: space-between; 
+            font-size: 14px; 
+            color: #4ecca3; 
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        #q-text { 
+            font-size: 1.3rem; 
+            line-height: 1.5; 
+            margin: 20px 0;
+            min-height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .dare-box { 
+            background: #e94560; 
+            padding: 15px; 
+            border-radius: 12px; 
+            margin: 10px 0; 
+            border: 2px dashed white;
+            font-size: 1.1rem;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .btn-group { width: 100%; }
+
+        button { 
+            width: 100%; 
+            padding: 16px; 
+            margin: 8px 0; 
+            border: none; 
+            border-radius: 12px; 
+            font-size: 1.1rem; 
+            font-weight: bold; 
+            cursor: pointer;
+            transition: transform 0.1s, opacity 0.2s;
+            touch-action: manipulation; /* 優化手機點擊延遲 */
+        }
+
+        button:active { transform: scale(0.96); opacity: 0.8; }
+
+        .btn-start, .btn-share { background: #4ecca3; color: #1a1a2e; }
         .btn-skip { background: #e94560; color: white; }
-        .btn-done { background: #f9d371; }
+        .btn-done { background: #f9d371; color: #1a1a2e; }
+        .btn-home { background: #334155; color: white; margin-top: 10px; }
+
         .hidden { display: none !important; }
-        .dare { background: #e94560; padding: 10px; margin: 10px 0; border: 2px dashed white; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
     </style>
 </head>
 <body>
 
-<div class="box">
-    <div id="ui-stats">
-        題數: <span id="q-count">0</span>/30 | 略過: <span id="s-count">0</span>/8
+<div class="container">
+    <div id="game-content">
+        <div class="stats">
+            <span>進度: <span id="q-count">0</span>/30</span>
+            <span style="color:#e94560;">略過: <span id="s-count">0</span>/8</span>
+        </div>
+
+        <h2 id="q-text">準備好了解彼此了嗎？</h2>
+        <div id="dare-box" class="dare-box hidden"></div>
     </div>
 
-    <h2 id="q-text">準備好開始挑戰了嗎？</h2>
-    <div id="dare-box" class="dare hidden"></div>
+    <div class="btn-group">
+        <button id="btn-start" class="btn-start" onclick="startGame()">開始遊戲</button>
+        
+        <button id="btn-share" class="btn-share hidden" onclick="handleShare()">我已分享 ✅ (下一題)</button>
+        <button id="btn-skip" class="btn-skip hidden" onclick="handleSkip()">Dare to Skip (挑戰任務)</button>
+        
+        <button id="btn-done" class="btn-done hidden" onclick="handleDone()">任務完成 (Done)</button>
 
-    <button id="btn-start" class="btn-start" onclick="startGame()">開始遊戲</button>
-    <button id="btn-share" class="btn-share hidden" onclick="handleShare()">我已分享 ✅ (下一題)</button>
-    <button id="btn-skip" class="btn-skip hidden" onclick="handleSkip()">Dare to Skip (大冒險)</button>
-    <button id="btn-done" class="btn-done hidden" onclick="handleDone()">任務完成 (Done)</button>
-
-    <div id="end-screen" class="hidden">
-        <h2 id="end-msg"></h2>
-        <button onclick="location.reload()">重新開始</button>
+        <div id="end-screen" class="hidden">
+            <h2 id="end-msg" style="color:#4ecca3;"></h2>
+            <button class="btn-start" onclick="location.reload()">再玩一次</button>
+            <button class="btn-home" onclick="location.href='index.html'">回大廳</button>
+        </div>
     </div>
 </div>
 
 <script>
-    // 50 個問題
-    var questions = [ "你最害怕失去什麼東西？", "如果你中了大獎，第一件事會買什麼？", "你最受不了別人什麼行為？",
-        "你心目中完美的約會是什麼樣子的？", "你曾做過最令你感到自豪的事是什麼？", "壓力很大的時候，你會怎麼宣洩？",
-        "如果可以交換人生一天，你想跟誰交換？", "你最不擅長處理的人際關係是什麼？", "你對自己的外表最滿意的地方是哪裡？",
-        "你最想改掉的一個壞習慣是什麼？", "如果你能預知未來，你想看什麼？", "你最喜歡的童年回憶是什麼？",
-        "如果你可以擁有一種超能力，你會選什麼？", "你覺得自己是理智派還是感性派？", "最讓你感動的一部電影或一本書？",
-        "你人生中遇過最尷尬的事情是什麼？", "你最嚮往的生活地點在哪裡？", "你覺得什麼樣的人最吸引你？",
-        "如果你只剩最後一天，你會想做什麼？", "你有什麼不為人知的特殊才華嗎？", "你最受不了哪種食物？",
-        "你理想中的工作是什麼？", "你覺得友誼中最重要的一點是什麼？", "你曾經後悔過什麼決定嗎？",
-        "如果可以回到過去，你想回到哪個時刻？", "你是一個容易相信別人的人嗎？", "什麼樣的讚美會讓你最開心？",
-        "你通常如何面對失敗？", "你最不喜歡自己性格中的哪一點？", "如果你可以變成一個動物，你會選哪個？",
-        "你心目中的英雄是誰？", "你最喜歡的放鬆方式是什麼？", "你覺得自己最大的優點是什麼？",
-        "如果你要寫自傳，書名會叫什麼？", "你曾對誰有過很深的愧疚感嗎？", "你最喜歡的季節是什麼？為什麼？",
-        "如果不考慮金錢，你現在最想做什麼？", "你覺得愛情中絕對不能原諒的事是什麼？", "你收過最棒的禮物是什麼？",
-        "你是一個重視過程還是結果的人？", "你平時有什麼特殊的蒐藏嗜好嗎？", "你最喜歡什麼樣的音樂類型？",
-        "如果你可以和任何一個死者對話，你想找誰？", "你覺得最幸福的時刻是什麼時候？", "你對成功的定義是什麼？",
-        "你認為自己有什麼潛力還沒被開發？", "你喜歡獨處還是待在人群中？", "你最重視的價值觀是什麼？",
-        "你曾夢想過自己未來的生活嗎？是什麼樣的？", "如果不當現在的職業/學生，你會做什麼？", "最自豪的事？", "壓力大怎麼宣洩？", "想跟誰交換人生一天？", "最不擅長的人際關係？", "外表最滿意的地方？", "想改掉的壞習慣？", "預知未來想看什麼？", "最愛的童年回憶？", "超能力選什麼？", "理智派還是感性派？", "感動的電影或書？", "最尷尬的事？", "嚮往的生活地點？", "什麼樣的人吸引你？", "剩最後一天想做什麼？", "不為人知的才華？", "受不了的食物？", "理想工作？", "友誼最重要的一點？", "後悔過的決定？", "想回到哪個時刻？", "容易相信人嗎？", "什麼讚美最開心？", "如何面對失敗？", "不喜歡自己性格哪點？", "想變什麼動物？", "心目中的英雄？", "放鬆方式？", "最大的優點？", "自傳書名？", "對誰有過愧疚？", "最愛的季節？", "不考慮錢想做什麼？", "愛情不能原諒的事？", "最棒的禮物？", "重視過程還是結果？", "特殊蒐藏？", "喜歡的音樂？", "想跟哪個死者對話？", "最幸福的時刻？", "成功的定義？", "未開發的潛力？", "喜歡獨處嗎？", "最重視的價值觀？", "夢想的生活？", "不當現在職業會做什麼？"];
+    var questions = ["你最害怕失去什麼？", "如果你中了大獎第一件事買什麼？", "你最受不了別人什麼行為？", "心目中完美的約會？", "最自豪的事？", "壓力大怎麼宣洩？", "想跟誰交換人生一天？", "最不擅長的人際關係？", "外表最滿意的地方？", "想改掉的壞習慣？", "預知未來想看什麼？", "最愛的童年回憶？", "超能力選什麼？", "理智派還是感性派？", "感動的電影或書？", "最尷尬的事？", "嚮往的生活地點？", "什麼樣的人吸引你？", "剩最後一天想做什麼？", "不為人知的才華？", "受不了的食物？", "理想工作？", "友誼最重要的一點？", "後悔過的決定？", "想回到哪個時刻？", "容易相信人嗎？", "什麼讚美最開心？", "如何面對失敗？", "不喜歡自己性格哪點？", "想變什麼動物？", "心目中的英雄？", "放鬆方式？", "最大的優點？", "自傳書名？", "對誰有過愧疚？", "最愛的季節？", "不考慮錢想做什麼？", "愛情不能原諒的事？", "最棒的禮物？", "重視過程還是結果？", "特殊蒐藏？", "喜歡的音樂？", "想跟哪個死者對話？", "最幸福的時刻？", "成功的定義？", "未開發的潛力？", "喜歡獨處嗎？", "最重視的價值觀？", "夢想的生活？", "不當現在職業會做什麼？"];
     
-    var dares = ["做5個表情", "朗讀最後一則簡訊", "喝一杯水", "模仿現場一人", "讚自己10樣野", "閉眼30秒", "展示出手機照片最後一張", "和右邊的人擊掌", "讓人在手上畫畫"];
+    var dares = ["做5個表情", "朗讀手機最後一條訊息", "喝下一杯水", "模仿現場一個人", "笑出聲 20 秒", "閉眼5分鐘", "展示相簿最後一張照片", "誇獎自己 30 秒", "無實物表演一段生活動作", "讓右邊的人在你手上畫圖"];
 
-    var qIndex = 0;
-    var skipCount = 0;
-
-    function startGame() {
-        document.getElementById('btn-start').classList.add('hidden');
-        document.getElementById('btn-share').classList.remove('hidden');
-        document.getElementById('btn-skip').classList.remove('hidden');
-        showNext();
-    }
-
-    function showNext() {
-        if (skipCount >= 8) {
-            endGame("略過次數過多，結束！");
-            return;
-        }
-        if (qIndex >= 30) {
-            endGame("恭喜完成 30 題！");
-            return;
-        }
-
-        document.getElementById('q-text').innerText = questions[Math.floor(Math.random() * questions.length)];
-        document.getElementById('q-count').innerText = qIndex + 1;
-        document.getElementById('s-count').innerText = skipCount;
-
-        // 重置按鈕
-        document.getElementById('dare-box').classList.add('hidden');
-        document.getElementById('btn-done').classList.add('hidden');
-        document.getElementById('btn-share').classList.remove('hidden');
-        document.getElementById('btn-skip').classList.remove('hidden');
-    }
-
-    function handleShare() {
-        qIndex++;
-        showNext();
-    }
-
-    function handleSkip() {
-        var randomDare = dares[Math.floor(Math.random() * dares.length)];
-        document.getElementById('dare-box').innerText = "挑戰： " + randomDare;
-        document.getElementById('dare-box').classList.remove('hidden');
-        
-        document.getElementById('btn-share').classList.add('hidden');
-        document.getElementById('btn-skip').classList.add('hidden');
-        document.getElementById('btn-done').classList.remove('hidden');
-    }
-
-    function handleDone() {
-        skipCount++;
-        qIndex++;
-        showNext();
-    }
-
-    function endGame(m) {
-        document.getElementById('q-text').classList.add('hidden');
-        document.getElementById('btn-share').classList.add('hidden');
-        document.getElementById('btn-skip').classList.add('hidden');
-        document.getElementById('btn-done').classList.add('hidden');
-        document.getElementById('end-screen').classList.remove('hidden');
-        document.getElementById('end-msg').innerText = m;
-    }
-</script>
-
-</body>
-</html>
+    var
