@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>每個人真心話 動作遊戲</title>
+    <title>角色真心話 - 派對遊戲</title>
     <style>
         body {
             font-family: 'Microsoft JhengHei', sans-serif;
@@ -34,7 +34,7 @@
         #question-display {
             font-size: 1.4rem;
             margin: 2rem 0;
-            min-height: 120px;
+            min-height: 140px;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -46,9 +46,11 @@
             color: white;
             padding: 15px;
             border-radius: 10px;
-            margin-top: 10px;
+            margin-top: 15px;
             font-size: 1.2rem;
             border: 2px dashed white;
+            width: 100%;
+            box-sizing: border-box;
         }
         .btn-group {
             display: flex;
@@ -71,7 +73,7 @@
         .btn-skip { background: #e94560; color: white; }
         .btn-done { background: #f9d371; color: #1a1a2e; }
         .btn-reset { background: #533483; color: white; margin-top: 20px; }
-        .hidden { display: none; }
+        .hidden { display: none !important; }
         .skip-warning { color: #e94560; font-weight: bold; }
     </style>
 </head>
@@ -85,7 +87,7 @@
         </div>
         
         <div id="question-display">
-            <div id="text-content">準備好開始挑戰了嗎？</div>
+            <div id="text-content">準備好了解彼此了嗎？</div>
             <div id="dare-content" class="dare-box hidden"></div>
         </div>
 
@@ -108,112 +110,4 @@
     const questions = [
         "你最害怕失去什麼東西？", "如果你中了大獎，第一件事會買什麼？", "你最受不了別人什麼行為？",
         "你心目中完美的約會是什麼樣子的？", "你曾做過最令你感到自豪的事是什麼？", "壓力很大的時候，你會怎麼宣洩？",
-        "如果可以交換人生一天，你想跟誰交換？", "你最不擅長處理的人際關係是什麼？", "你對自己的外表最滿意的地方是哪裡？",
-        "你最想改掉的一個壞習慣是什麼？", "如果你能預知未來，你想看什麼？", "你最喜歡的童年回憶是什麼？",
-        "如果你可以擁有一種超能力，你會選什麼？", "你覺得自己是理智派還是感性派？", "最讓你感動的一部電影或一本書？",
-        "你人生中遇過最尷尬的事情是什麼？", "你最嚮往的生活地點在哪裡？", "你覺得什麼樣的人最吸引你？",
-        "如果你只剩最後一天，你會想做什麼？", "你有什麼不為人知的特殊才華嗎？", "你最受不了哪種食物？",
-        "你理想中的工作是什麼？", "你覺得友誼中最重要的一點是什麼？", "你曾經後悔過什麼決定嗎？",
-        "如果可以回到過去，你想回到哪個時刻？", "你是一個容易相信別人的人嗎？", "什麼樣的讚美會讓你最開心？",
-        "你通常如何面對失敗？", "你最不喜歡自己性格中的哪一點？", "如果你可以變成一個動物，你會選哪個？",
-        "你心目中的英雄是誰？", "你最喜歡的放鬆方式是什麼？", "你覺得自己最大的優點是什麼？",
-        "如果你要寫自傳，書名會叫什麼？", "你曾對誰有過很深的愧疚感嗎？", "你最喜歡的季節是什麼？為什麼？",
-        "如果不考慮金錢，你現在最想做什麼？", "你覺得愛情中絕對不能原諒的事是什麼？", "你收過最棒的禮物是什麼？",
-        "你是一個重視過程還是結果的人？", "你平時有什麼特殊的蒐藏嗜好嗎？", "你最喜歡什麼樣的音樂類型？",
-        "如果你可以和任何一個死者對話，你想找誰？", "你覺得最幸福的時刻是什麼時候？", "你對成功的定義是什麼？",
-        "你認為自己有什麼潛力還沒被開發？", "你喜歡獨處還是待在人群中？", "你最重視的價值觀是什麼？",
-        "你曾夢想過自己未來的生活嗎？是什麼樣的？", "如果不當現在的職業/學生，你會做什麼？"
-    ];
-
-    const dares = [
-        "做4個不同表情",
-        "用充滿感情的方式朗讀手機裡最後一條訊息",
-        "喝下一杯水",
-        "模仿在場的一個人，直到有人猜出來是誰",
-        "唱歌20秒",
-        "閉上眼睛30秒",
-        "展示手機相簿裡最後一張照片",
-        "單腳企30秒,
-        "表演一件拿手的事",
-        "跟右邊的人擊掌"
-    ];
-
-    let qIndex = 0;
-    let skipCount = 0;
-    let shuffledQuestions = [...questions].sort(() => Math.random() - 0.5);
-
-    const textContent = document.getElementById('text-content');
-    const dareContent = document.getElementById('dare-content');
-    const qCountText = document.getElementById('q-count');
-    const skipCountText = document.getElementById('skip-count');
-    
-    const startBtn = document.getElementById('start-btn');
-    const shareBtn = document.getElementById('share-btn');
-    const skipBtn = document.getElementById('skip-btn');
-    const doneBtn = document.getElementById('done-btn');
-    
-    const gameUI = document.getElementById('game-ui');
-    const endScreen = document.getElementById('end-screen');
-    const endMessage = document.getElementById('end-message');
-
-    function renderQuestion() {
-        textContent.innerText = shuffledQuestions[qIndex];
-        dareContent.classList.add('hidden');
-        
-        shareBtn.classList.remove('hidden');
-        skipBtn.classList.remove('hidden');
-        doneBtn.classList.add('hidden');
-        
-        qCountText.innerText = qIndex + 1;
-        skipCountText.innerText = skipCount;
-    }
-
-    function checkEndConditions() {
-        if (skipCount >= 8) {
-            endGame("太狠了！挑戰次數用盡，遊戲結束。");
-            return true;
-        }
-        if (qIndex >= 30) {
-            endGame("太棒了！你們完成了 30 題的靈魂交流。");
-            return true;
-        }
-        return false;
-    }
-
-    function endGame(msg) {
-        gameUI.classList.add('hidden');
-        endScreen.classList.remove('hidden');
-        endMessage.innerText = msg;
-    }
-
-    startBtn.addEventListener('click', () => {
-        startBtn.classList.add('hidden');
-        renderQuestion();
-    });
-
-    shareBtn.addEventListener('click', () => {
-        qIndex++;
-        if (!checkEndConditions()) renderQuestion();
-    });
-
-    skipBtn.addEventListener('click', () => {
-        // 隨機選一個大冒險
-        const randomDare = dares[Math.floor(Math.random() * dares.length)];
-        dareContent.innerText = "🔥 挑戰任務：\n" + randomDare;
-        dareContent.classList.remove('hidden');
-        
-        // 切換按鈕狀態
-        shareBtn.classList.add('hidden');
-        skipBtn.classList.add('hidden');
-        doneBtn.classList.remove('hidden');
-    });
-
-    doneBtn.addEventListener('click', () => {
-        skipCount++;
-        qIndex++;
-        if (!checkEndConditions()) renderQuestion();
-    });
-</script>
-
-</body>
-</html>
+        "如果可以交換人生一天，你想跟誰交換？", "你最不擅長處理的人際關係是什麼？", "你對自己的外表最滿意的地方
