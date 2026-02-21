@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Character Deep-Dive Game</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #1a1a2e;
+            color: #efefef;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background: #16213e;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            text-align: center;
+            max-width: 500px;
+            width: 90%;
+        }
+        .stats {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9rem;
+            color: #4ecca3;
+            margin-bottom: 20px;
+        }
+        #question-display {
+            font-size: 1.5rem;
+            margin: 2rem 0;
+            min-height: 100px;
+        }
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+        button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: transform 0.1s, opacity 0.2s;
+        }
+        button:active { transform: scale(0.95); }
+        .btn-share { background: #4ecca3; color: #1a1a2e; }
+        .btn-next { background: #e94560; color: white; }
+        .btn-reset { background: #533483; color: white; margin-top: 20px; }
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div id="game-ui">
+        <div class="stats">
+            <span>Questions: <span id="q-count">0</span>/30</span>
+            <span>Skips: <span id="skip-count">0</span>/8</span>
+        </div>
+        
+        <div id="question-display">Press "Start" to begin!</div>
+
+        <div class="btn-group">
+            <button id="share-btn" class="btn-share hidden">Shared! ✅</button>
+            <button id="next-btn" class="btn-next">Start Game</button>
+        </div>
+    </div>
+
+    <div id="end-screen" class="hidden">
+        <h2 id="end-message">Game Over</h2>
+        <button class="btn-reset" onclick="location.reload()">Play Again</button>
+    </div>
+</div>
+
+<script>
+    const questions = [
+        "What is your character's biggest secret fear?",
+        "If your character won the lottery, what’s the first thing they’d buy?",
+        "What is one habit your character has that annoys others?",
+        "Who was your character's first crush?",
+        "What is your character's proudest accomplishment?",
+        "How does your character react to extreme stress?",
+        "What does your character’s bedroom look like?",
+        "What is the one thing your character would never do, even for money?",
+        "Does your character prefer the city or the countryside?",
+        "What is your character's 'guilty pleasure'?",
+        // Add as many questions as you like here!
+    ];
+
+    let qIndex = 0;
+    let skipCount = 0;
+    let sharedThisTurn = false;
+    let gameStarted = false;
+
+    const qDisplay = document.getElementById('question-display');
+    const qCountText = document.getElementById('q-count');
+    const skipCountText = document.getElementById('skip-count');
+    const nextBtn = document.getElementById('next-btn');
+    const shareBtn = document.getElementById('share-btn');
+    const gameUI = document.getElementById('game-ui');
+    const endScreen = document.getElementById('end-screen');
+    const endMessage = document.getElementById('end-message');
+
+    function updateDisplay() {
+        if (qIndex >= 30) {
+            endGame("You finished all 30 questions! Well done.");
+            return;
+        }
+        if (skipCount >= 8) {
+            endGame("Too many skips! Game Over.");
+            return;
+        }
+
+        const randomQ = questions[Math.floor(Math.random() * questions.length)];
+        qDisplay.innerText = randomQ;
+        qCountText.innerText = qIndex + 1;
+        skipCountText.innerText = skipCount;
+        sharedThisTurn = false;
+        shareBtn.style.opacity = "1";
+    }
+
+    function endGame(msg) {
+        gameUI.classList.add('hidden');
+        endScreen.classList.remove('hidden');
+        endMessage.innerText = msg;
+    }
+
+    nextBtn.addEventListener('click', () => {
+        if (!gameStarted) {
+            gameStarted = true;
+            nextBtn.innerText = "Next Question";
+            shareBtn.classList.remove('hidden');
+            updateDisplay();
+            return;
+        }
+
+        if (!sharedThisTurn) {
+            skipCount++;
+        }
+
+        qIndex++;
+        updateDisplay();
+    });
+
+    shareBtn.addEventListener('click', () => {
+        sharedThisTurn = true;
+        shareBtn.style.opacity = "0.3"; // Visual feedback for clicking
+    });
+</script>
+
+</body>
+</html>
