@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-Hant">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Character Deep-Dive Game</title>
+    <title>角色真心話 - 派對遊戲</title>
     <style>
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Microsoft JhengHei', sans-serif;
             background: #1a1a2e;
             color: #efefef;
             display: flex;
@@ -27,18 +27,19 @@
         .stats {
             display: flex;
             justify-content: space-between;
-            font-size: 0.9rem;
+            font-size: 1rem;
             color: #4ecca3;
             margin-bottom: 20px;
         }
         #question-display {
-            font-size: 1.5rem;
+            font-size: 1.4rem;
             margin: 2rem 0;
-            min-height: 100px;
+            min-height: 120px;
+            line-height: 1.6;
         }
         .btn-group {
             display: flex;
-            gap: 10px;
+            gap: 15px;
             justify-content: center;
         }
         button {
@@ -47,13 +48,15 @@
             border-radius: 8px;
             cursor: pointer;
             font-weight: bold;
-            transition: transform 0.1s, opacity 0.2s;
+            font-size: 1rem;
+            transition: all 0.2s;
         }
         button:active { transform: scale(0.95); }
         .btn-share { background: #4ecca3; color: #1a1a2e; }
         .btn-next { background: #e94560; color: white; }
         .btn-reset { background: #533483; color: white; margin-top: 20px; }
         .hidden { display: none; }
+        .skip-warning { color: #e94560; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -61,43 +64,52 @@
 <div class="container">
     <div id="game-ui">
         <div class="stats">
-            <span>Questions: <span id="q-count">0</span>/30</span>
-            <span>Skips: <span id="skip-count">0</span>/8</span>
+            <span>進度: <span id="q-count">0</span> / 30</span>
+            <span class="skip-warning">跳過次數: <span id="skip-count">0</span> / 8</span>
         </div>
         
-        <div id="question-display">Press "Start" to begin!</div>
+        <div id="question-display">點擊下方按鈕開始遊戲</div>
 
         <div class="btn-group">
-            <button id="share-btn" class="btn-share hidden">Shared! ✅</button>
-            <button id="next-btn" class="btn-next">Start Game</button>
+            <button id="share-btn" class="btn-share hidden">我已分享 ✅</button>
+            <button id="next-btn" class="btn-next">開始遊戲</button>
         </div>
     </div>
 
     <div id="end-screen" class="hidden">
-        <h2 id="end-message">Game Over</h2>
-        <button class="btn-reset" onclick="location.reload()">Play Again</button>
+        <h2 id="end-message">遊戲結束</h2>
+        <button class="btn-reset" onclick="location.reload()">重新開始</button>
+        <br>
+        <button class="btn-reset" onclick="location.href='index.html'" style="background:#334155;">回首頁</button>
     </div>
 </div>
 
 <script>
     const questions = [
-        "What is your character's biggest secret fear?",
-        "If your character won the lottery, what’s the first thing they’d buy?",
-        "What is one habit your character has that annoys others?",
-        "Who was your character's first crush?",
-        "What is your character's proudest accomplishment?",
-        "How does your character react to extreme stress?",
-        "What does your character’s bedroom look like?",
-        "What is the one thing your character would never do, even for money?",
-        "Does your character prefer the city or the countryside?",
-        "What is your character's 'guilty pleasure'?",
-        // Add as many questions as you like here!
+        "你最害怕失去什麼東西？", "如果你中了大獎，第一件事會買什麼？", "你最受不了別人什麼行為？",
+        "你心目中完美的約會是什麼樣子的？", "你曾做過最令你感到自豪的事是什麼？", "壓力很大的時候，你會怎麼宣洩？",
+        "如果可以交換人生一天，你想跟誰交換？", "你最不擅長處理的人際關係是什麼？", "你對自己的外表最滿意的地方是哪裡？",
+        "你最想改掉的一個壞習慣是什麼？", "如果你能預知未來，你想看什麼？", "你最喜歡的童年回憶是什麼？",
+        "如果你可以擁有一種超能力，你會選什麼？", "你覺得自己是理智派還是感性派？", "最讓你感動的一部電影或一本書？",
+        "你人生中遇過最尷尬的事情是什麼？", "你最嚮往的生活地點在哪裡？", "你覺得什麼樣的人最吸引你？",
+        "如果你只剩最後一天，你會想做什麼？", "你有什麼不為人知的特殊才華嗎？", "你最受不了哪種食物？",
+        "你理想中的工作是什麼？", "你覺得友誼中最重要的一點是什麼？", "你曾經後悔過什麼決定嗎？",
+        "如果可以回到過去，你想回到哪個時刻？", "你是一個容易相信別人的人嗎？", "什麼樣的讚美會讓你最開心？",
+        "你通常如何面對失敗？", "你最不喜歡自己性格中的哪一點？", "如果你可以變成一個動物，你會選哪個？",
+        "你心目中的英雄是誰？", "你最喜歡的放鬆方式是什麼？", "你覺得自己最大的優點是什麼？",
+        "如果你要寫自傳，書名會叫什麼？", "你曾對誰有過很深的愧疚感嗎？", "你最喜歡的季節是什麼？為什麼？",
+        "如果不考慮金錢，你現在最想做什麼？", "你覺得愛情中絕對不能原諒的事是什麼？", "你收過最棒的禮物是什麼？",
+        "你是一個重視過程還是結果的人？", "你平時有什麼特殊的蒐藏嗜好嗎？", "你最喜歡什麼樣的音樂類型？",
+        "如果你可以和任何一個死者對話，你想找誰？", "你覺得最幸福的時刻是什麼時候？", "你對成功的定義是什麼？",
+        "你認為自己有什麼潛力還沒被開發？", "你喜歡獨處還是待在人群中？", "你最重視的價值觀是什麼？",
+        "你曾夢想過自己未來的生活嗎？是什麼樣的？", "如果不當現在的職業/學生，你會做什麼？"
     ];
 
     let qIndex = 0;
     let skipCount = 0;
     let sharedThisTurn = false;
     let gameStarted = false;
+    let currentQuestions = [...questions].sort(() => Math.random() - 0.5);
 
     const qDisplay = document.getElementById('question-display');
     const qCountText = document.getElementById('q-count');
@@ -110,19 +122,19 @@
 
     function updateDisplay() {
         if (qIndex >= 30) {
-            endGame("You finished all 30 questions! Well done.");
+            endGame("挑戰完成！你已經回答了 30 個問題。");
             return;
         }
         if (skipCount >= 8) {
-            endGame("Too many skips! Game Over.");
+            endGame("太可惜了！你略過了太多次，遊戲結束。");
             return;
         }
 
-        const randomQ = questions[Math.floor(Math.random() * questions.length)];
-        qDisplay.innerText = randomQ;
+        qDisplay.innerText = currentQuestions[qIndex];
         qCountText.innerText = qIndex + 1;
         skipCountText.innerText = skipCount;
         sharedThisTurn = false;
+        shareBtn.innerText = "我已分享 ✅";
         shareBtn.style.opacity = "1";
     }
 
@@ -135,7 +147,7 @@
     nextBtn.addEventListener('click', () => {
         if (!gameStarted) {
             gameStarted = true;
-            nextBtn.innerText = "Next Question";
+            nextBtn.innerText = "下一題";
             shareBtn.classList.remove('hidden');
             updateDisplay();
             return;
@@ -151,9 +163,11 @@
 
     shareBtn.addEventListener('click', () => {
         sharedThisTurn = true;
-        shareBtn.style.opacity = "0.3"; // Visual feedback for clicking
+        shareBtn.innerText = "記錄成功！";
+        shareBtn.style.opacity = "0.5";
     });
 </script>
 
 </body>
 </html>
+
