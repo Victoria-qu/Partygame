@@ -124,6 +124,74 @@
 <script>
     var questions = ["你最害怕失去什麼？", "如果你中了大獎第一件事買什麼？", "你最受不了別人什麼行為？", "心目中完美的約會？", "最自豪的事？", "壓力大怎麼宣洩？", "想跟誰交換人生一天？", "最不擅長的人際關係？", "外表最滿意的地方？", "想改掉的壞習慣？", "預知未來想看什麼？", "最愛的童年回憶？", "超能力選什麼？", "理智派還是感性派？", "感動的電影或書？", "最尷尬的事？", "嚮往的生活地點？", "什麼樣的人吸引你？", "剩最後一天想做什麼？", "不為人知的才華？", "受不了的食物？", "理想工作？", "友誼最重要的一點？", "後悔過的決定？", "想回到哪個時刻？", "容易相信人嗎？", "什麼讚美最開心？", "如何面對失敗？", "不喜歡自己性格哪點？", "想變什麼動物？", "心目中的英雄？", "放鬆方式？", "最大的優點？", "自傳書名？", "對誰有過愧疚？", "最愛的季節？", "不考慮錢想做什麼？", "愛情不能原諒的事？", "最棒的禮物？", "重視過程還是結果？", "特殊蒐藏？", "喜歡的音樂？", "想跟哪個死者對話？", "最幸福的時刻？", "成功的定義？", "未開發的潛力？", "喜歡獨處嗎？", "最重視的價值觀？", "夢想的生活？", "不當現在職業會做什麼？"];
     
-    var dares = ["做5個表情", "朗讀手機最後一條訊息", "喝下一杯水", "模仿現場一個人", "笑出聲 20 秒", "閉眼5分鐘", "展示相簿最後一張照片", "誇獎自己 30 秒", "無實物表演一段生活動作", "讓右邊的人在你手上畫圖"];
+    var dares = ["做 10 個開合跳", "朗讀手機最後一條訊息", "喝下一大杯水", "模仿現場一個人", "維持平板支撐 30 秒", "閉眼由他人餵食", "展示相簿最後一張照片", "對著鏡子誇獎自己 30 秒", "無實物表演一段生活動作", "讓右邊的人在你手上畫圖"];
 
-    var
+    var qIndex = 0;
+    var skipCount = 0;
+    var currentQList = [...questions].sort(() => Math.random() - 0.5);
+
+    function startGame() {
+        document.getElementById('btn-start').classList.add('hidden');
+        document.getElementById('btn-share').classList.remove('hidden');
+        document.getElementById('btn-skip').classList.remove('hidden');
+        showNext();
+    }
+
+    function showNext() {
+        if (skipCount >= 8) {
+            endGame("太可惜了！略過次數達標。");
+            return;
+        }
+        if (qIndex >= 30) {
+            endGame("恭喜！順利完成 30 題挑戰！");
+            return;
+        }
+
+        document.getElementById('q-text').innerText = currentQList[qIndex];
+        document.getElementById('q-count').innerText = qIndex + 1;
+        document.getElementById('s-count').innerText = skipCount;
+
+        // 重置介面
+        document.getElementById('dare-box').classList.add('hidden');
+        document.getElementById('btn-done').classList.add('hidden');
+        document.getElementById('btn-share').classList.remove('hidden');
+        document.getElementById('btn-skip').classList.remove('hidden');
+        document.getElementById('q-text').classList.remove('hidden');
+    }
+
+    function handleShare() {
+        qIndex++;
+        showNext();
+    }
+
+    function handleSkip() {
+        var randomDare = dares[Math.floor(Math.random() * dares.length)];
+        var box = document.getElementById('dare-box');
+        box.innerText = "🔥 任務： " + randomDare;
+        box.classList.remove('hidden');
+        
+        document.getElementById('btn-share').classList.add('hidden');
+        document.getElementById('btn-skip').classList.add('hidden');
+        document.getElementById('btn-done').classList.remove('hidden');
+    }
+
+    function handleDone() {
+        skipCount++;
+        qIndex++;
+        showNext();
+    }
+
+    function endGame(m) {
+        document.getElementById('q-text').classList.add('hidden');
+        document.getElementById('dare-box').classList.add('hidden');
+        document.getElementById('btn-share').classList.add('hidden');
+        document.getElementById('btn-skip').classList.add('hidden');
+        document.getElementById('btn-done').classList.add('hidden');
+        
+        document.getElementById('end-screen').classList.remove('hidden');
+        document.getElementById('end-msg').innerText = m;
+    }
+</script>
+
+</body>
+</html>
